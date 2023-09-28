@@ -1,26 +1,20 @@
 // import {attach, createEvent, createStore, sample} from 'effector';
 // import {and, empty, every, not, reset} from 'patronum';
-import {routes} from '~/shared/routing';
-
 // import * as api from '~/shared/api';
 // import {routes} from '~/shared/routing';
 // import {chainAnonymous, sessionRequestFx} from '~/shared/session';
-
 // export const currentRoute = routes.auth.register;
 // export const anonymousRoute = chainAnonymous(currentRoute, {
 //   otherwise: routes.search.open,
 // });
-
 // const signUpFx = attach({effect: api.signUpFx});
 // const confirmPhoneFx = attach({effect: api.confirmPhone});
-
 // export const createField = <Value, Error>(defaultValue: Value) => {
 //   const $value = createStore(defaultValue);
 //   const $error = createStore<Error | null>(null);
 //   const $set = createEvent<string>();
 //   return [$value, $set, $error] as const;
 // };
-
 // export const [$email, emailChanged, $emailError] = createField<string, null | 'empty' | 'invalid'>(
 //   '',
 // );
@@ -30,13 +24,10 @@ import {routes} from '~/shared/routing';
 //   null | 'empty' | 'invalid'
 // >('');
 // export const [$phone, phoneChanged, $phoneError] = createField<string, null | 'empty'>('');
-
 // export const $code = createStore('');
 // export const codeChanged = createEvent<string>();
-
 // export const $signUpError = createStore<api.SignUpError | null>(null);
 // export const $confirmPhone = createStore(false);
-
 // export const pageMounted = createEvent();
 // reset({
 //   clock: pageMounted,
@@ -54,7 +45,6 @@ import {routes} from '~/shared/routing';
 //     $confirmPhone,
 //   ],
 // });
-
 // export const $registretionFormDisabled = signUpFx.pending;
 // const $registretionFormValid = every({
 //   // @ts-ignore
@@ -62,18 +52,14 @@ import {routes} from '~/shared/routing';
 //   predicate: null,
 // });
 // export const registretionFormSubmitted = createEvent();
-
 // export const confirmPhoneFormSubmitted = createEvent();
 // export const $confirmPhoneFormDisabled = confirmPhoneFx.pending;
-
 // $email.on(emailChanged, (_, email) => email);
 // $username.on(usernameChanged, (_, username) => username);
 // $password.on(passwordChanged, (_, password) => password);
 // $phone.on(phoneChanged, (_, phone) => phone);
 // $code.on(codeChanged, (_, code) => code);
-
 // $signUpError.reset(registretionFormSubmitted);
-
 // sample({
 //   clock: registretionFormSubmitted,
 //   source: $email,
@@ -84,7 +70,6 @@ import {routes} from '~/shared/routing';
 //   },
 //   target: $emailError,
 // });
-
 // sample({
 //   clock: registretionFormSubmitted,
 //   source: $username,
@@ -94,7 +79,6 @@ import {routes} from '~/shared/routing';
 //   },
 //   target: $usernameError,
 // });
-
 // sample({
 //   clock: registretionFormSubmitted,
 //   source: $password,
@@ -105,7 +89,6 @@ import {routes} from '~/shared/routing';
 //   },
 //   target: $passwordError,
 // });
-
 // sample({
 //   clock: registretionFormSubmitted,
 //   source: $phone,
@@ -115,43 +98,41 @@ import {routes} from '~/shared/routing';
 //   },
 //   target: $phoneError,
 // });
-
 // sample({
 //   clock: registretionFormSubmitted,
 //   source: {email: $email, password: $password, phone: $phone, username: $username},
 //   filter: and(not($registretionFormDisabled), $registretionFormValid),
 //   target: signUpFx,
 // });
-
 // $signUpError.on(signUpFx.failData, (_, error) => error);
 // $confirmPhone.on(signUpFx.done, () => true);
-
 // sample({
 //   clock: confirmPhoneFormSubmitted,
 //   source: {code: $code},
 //   filter: not($registretionFormDisabled),
 //   target: confirmPhoneFx,
 // });
-
 // sample({
 //   clock: confirmPhoneFx.done,
 //   target: sessionRequestFx,
 // });
-
 // function isEmailValid(email: string) {
 //   return email.includes('@') && email.length > 5;
 // }
-
 // function isPasswordValid(password: string) {
 //   return password.length > 5;
 // }
-
 // function isEmpty(input: string) {
 //   return input.trim().length === 0;
 // }
+import {sample} from 'effector';
+
+import {sessionGetFx} from '~/shared/api';
+import {routes} from '~/shared/routing';
 
 export const currentRoute = routes.auth.register;
+const authorizedRoute = currentRoute;
 
 currentRoute.opened.watch(() => {
-  console.log('Register page is open');
+  // console.log('Register page is open');
 });
