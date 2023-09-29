@@ -129,10 +129,18 @@ import {sample} from 'effector';
 
 import {sessionGetFx} from '~/shared/api';
 import {routes} from '~/shared/routing';
+import {chainAnonymous} from '~/shared/session';
 
 export const currentRoute = routes.auth.register;
-const authorizedRoute = currentRoute;
+
+export const ananimusRoute = chainAnonymous(currentRoute, {
+  otherwise: routes.search.open,
+});
 
 currentRoute.opened.watch(() => {
   // console.log('Register page is open');
+});
+
+ananimusRoute.opened.watch(() => {
+  // console.log('Register page is open with authorized user');
 });

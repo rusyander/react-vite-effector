@@ -77,9 +77,20 @@
 //   filter: not($searching),
 //   target: searchNextPageFx,
 // });
+import {chainRoute} from 'atomic-router';
+
 import {routes} from '~/shared/routing';
+import {chainAuthorized} from '~/shared/session';
 
 export const currentRoute = routes.search;
-currentRoute.opened.watch(() => {
-  console.log('Search page is open');
+export const authorizedRoute = chainAuthorized(currentRoute, {
+  otherwise: routes.auth.login.open,
+});
+// export const recipesLoadRoute = chainRoute({
+//   route: authorizedRoute,
+//   beforeOpen: 1 as any,
+// });
+
+authorizedRoute.opened.watch(() => {
+  console.log('Search page is open with authorized user');
 });
