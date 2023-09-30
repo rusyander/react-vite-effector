@@ -125,11 +125,12 @@
 // function isEmpty(input: string) {
 //   return input.trim().length === 0;
 // }
-import {sample} from 'effector';
+import {attach, createEvent, createStore, sample} from 'effector';
+import {every, reset} from 'patronum';
 
-import {sessionGetFx} from '~/shared/api';
+import * as api from '~/shared/api';
 import {routes} from '~/shared/routing';
-import {chainAnonymous} from '~/shared/session';
+import {chainAnonymous, sessionRequestFx} from '~/shared/session';
 
 export const currentRoute = routes.auth.register;
 
@@ -144,3 +145,130 @@ currentRoute.opened.watch(() => {
 ananimusRoute.opened.watch(() => {
   // console.log('Register page is open with authorized user');
 });
+export const signUpFx = attach({effect: api.signUpFx});
+
+export const pageMounted = createEvent();
+export const updateUserName = createEvent<string>();
+export const updateEmail = createEvent<string>();
+export const updatePassword = createEvent<string>();
+export const updatePhone = createEvent<string>();
+export const submittFormRegistration = createEvent();
+
+export const $userName = createStore('');
+export const $userNameError = createStore<null | 'empty' | 'invalid'>(null);
+
+export const $email = createStore('');
+export const $emailError = createStore<null | 'empty' | 'invalid'>(null);
+
+export const $password = createStore('');
+export const $passwordError = createStore<null | 'empty' | 'invalid'>(null);
+
+export const $phone = createStore('');
+export const $phoneError = createStore<null | 'empty' | 'invalid'>(null);
+
+export const $error = createStore<api.SignUpError | null>(null);
+export const $fieldsPending = api.signUpFx.pending;
+
+export const $formValid = every({
+  stores: [$userNameError, $emailError, $passwordError, $phoneError],
+  predicate: null,
+});
+
+$userName.on(updateUserName, (_, userName) => userName);
+$email.on(updateEmail, (_, email) => email);
+$password.on(updatePassword, (_, password) => password);
+$phone.on(updatePhone, (_, phone) => phone);
+
+reset({
+  clock: pageMounted,
+  target: [
+    $userName,
+    $userNameError,
+    $email,
+    $emailError,
+    $password,
+    $passwordError,
+    $phone,
+    $phoneError,
+    $error,
+  ],
+});
+
+sample({
+  clock: submittFormRegistration,
+  source: $userName,
+  fn: (userName) => {
+    if (!currentUserName(userName)) return 'invalid';
+    if (isEmpty(userName)) return 'empty';
+    return null;
+  },
+  target: $userNameError,
+});
+
+sample({
+  clock: submittFormRegistration,
+  source: $email,
+  fn: (email) => {
+    if (!currentEmail(email)) return 'invalid';
+    if (isEmpty(email)) return 'empty';
+    return null;
+  },
+  target: $emailError,
+});
+
+sample({
+  clock: submittFormRegistration,
+  source: $password,
+  fn: (password) => {
+    if (!currenttPassword(password)) return 'invalid';
+    if (isEmpty(password)) return 'empty';
+    return null;
+  },
+  target: $passwordError,
+});
+
+sample({
+  clock: submittFormRegistration,
+  source: $phone,
+  fn: (phone) => {
+    if (!currentPhone(phone)) return 'invalid';
+    if (isEmpty(phone)) return 'empty';
+    return null;
+  },
+  target: $phoneError,
+});
+
+sample({
+  clock: submittFormRegistration,
+  source: {username: $userName, email: $email, password: $password, phone: $phone},
+  filter: $formValid,
+  target: signUpFx,
+});
+
+sample({
+  clock: signUpFx.done,
+  target: sessionRequestFx,
+});
+
+$error.reset(submittFormRegistration);
+$error.on(signUpFx.failData, (_, error) => error);
+
+function currentUserName(value: string) {
+  return value.length > 3;
+}
+
+function currentEmail(value: string) {
+  return value.includes('@') && value.length > 5;
+}
+
+function currenttPassword(value: string) {
+  return value.length > 3;
+}
+
+function currentPhone(value: string) {
+  return value.length > 6;
+}
+
+function isEmpty(value: string) {
+  return value.trim().length === 0;
+}

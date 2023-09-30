@@ -20,40 +20,35 @@ import {IMaskInput} from 'react-imask';
 
 import {routes} from '~/shared/routing';
 
-// import {
-//   $code,
-//   $confirmPhone,
-//   $confirmPhoneFormDisabled,
-//   $email,
-//   $emailError,
-//   $password,
-//   $passwordError,
-//   $phone,
-//   $phoneError,
-//   $registretionFormDisabled,
-//   $signUpError,
-//   $username,
-//   $usernameError,
-//   codeChanged,
-//   confirmPhoneFormSubmitted,
-//   emailChanged,
-//   pageMounted,
-//   passwordChanged,
-//   phoneChanged,
-//   registretionFormSubmitted,
-//   usernameChanged,
-// } from './model';
+import {
+  $email,
+  $emailError,
+  $error,
+  $fieldsPending,
+  $password,
+  $passwordError,
+  $phone,
+  $phoneError,
+  $userName,
+  $userNameError,
+  pageMounted,
+  submittFormRegistration,
+  updateEmail,
+  updatePassword,
+  updatePhone,
+  updateUserName,
+} from './model';
 
 export const RegisterPage = () => {
   // const [confirmPhone] = useUnit([$confirmPhone]);
 
   useEffect(() => {
-    // pageMounted();
+    pageMounted();
   }, []);
 
   const onFormSubmit: FormEventHandler = (e) => {
     e.preventDefault();
-    // registretionFormSubmitted();
+    submittFormRegistration();
   };
 
   // if (confirmPhone) return <ConfrimPhoneForm />;
@@ -102,24 +97,25 @@ export const RegisterPage = () => {
 
 const usernameErrorText = {
   empty: 'Username не может быть пустым',
+  invalid: '',
 };
 
 function Username() {
-  // const [username, usernameError, registretionFormDisabled] = useUnit([
-  //   $username,
-  //   $usernameError,
-  //   $registretionFormDisabled,
-  // ]);
+  const [username, usernameError, fieldsPending] = useUnit([
+    $userName,
+    $userNameError,
+    $fieldsPending,
+  ]);
 
   return (
     <TextInput
       label="username"
       placeholder="username"
       icon={<IconUser size="0.8rem" />}
-      // value={username}
-      // onChange={(event) => usernameChanged(event.target.value)}
-      // disabled={registretionFormDisabled}
-      // error={usernameError ? usernameErrorText[usernameError] : null}
+      value={username}
+      onChange={(event) => updateUserName(event.target.value)}
+      disabled={fieldsPending}
+      error={usernameError ? usernameErrorText[usernameError] : null}
     />
   );
 }
@@ -130,21 +126,17 @@ const emailErrorText = {
 };
 
 function Email() {
-  // const [email, emailError, registretionFormDisabled] = useUnit([
-  //   $email,
-  //   $emailError,
-  //   $registretionFormDisabled,
-  // ]);
+  const [email, emailError, fieldsPending] = useUnit([$email, $emailError, $fieldsPending]);
 
   return (
     <TextInput
       label="email"
       placeholder="email"
       icon={<IconAt size="0.8rem" />}
-      // value={email}
-      // onChange={(event) => emailChanged(event.target.value)}
-      // disabled={registretionFormDisabled}
-      // error={emailError ? emailErrorText[emailError] : null}
+      value={email}
+      onChange={(event) => updateEmail(event.target.value)}
+      disabled={fieldsPending}
+      error={emailError ? emailErrorText[emailError] : null}
     />
   );
 }
@@ -155,11 +147,11 @@ const passwordErrorText = {
 };
 
 function Password() {
-  // const [password, passwordError, registretionFormDisabled] = useUnit([
-  //   $password,
-  //   $passwordError,
-  //   $registretionFormDisabled,
-  // ]);
+  const [password, passwordError, fieldsPending] = useUnit([
+    $password,
+    $passwordError,
+    $fieldsPending,
+  ]);
 
   return (
     <PasswordInput
@@ -167,60 +159,57 @@ function Password() {
       placeholder="your password"
       mt="md"
       icon={<IconLock size="0.8rem" />}
-      // value={password}
-      // onChange={(event) => passwordChanged(event.target.value)}
-      // disabled={registretionFormDisabled}
-      // error={passwordError ? passwordErrorText[passwordError] : null}
+      value={password}
+      onChange={(event) => updatePassword(event.target.value)}
+      disabled={fieldsPending}
+      error={passwordError ? passwordErrorText[passwordError] : null}
     />
   );
 }
 
 const phoneErrorText = {
   empty: 'Username не может быть пустым',
+  invalid: '',
 };
 
 function Phone() {
-  // const [phone, phoneError, registretionFormDisabled] = useUnit([
-  //   $phone,
-  //   $phoneError,
-  //   $registretionFormDisabled,
-  // ]);
+  const [phone, phoneError, fieldsPending] = useUnit([$phone, $phoneError, $fieldsPending]);
 
   return (
     <Input.Wrapper
       label="phone"
       required
       mt="md"
-      // error={phoneError ? phoneErrorText[phoneError] : null}
+      error={phoneError ? phoneErrorText[phoneError] : null}
     >
       <Input
         component={IMaskInput}
         mask="+7 (000) 000-00-00"
         placeholder="Your phone"
         icon={<IconPhone size="0.8rem" />}
-        // value={phone}
-        // disabled={registretionFormDisabled}
-        // error={phoneError ? phoneErrorText[phoneError] : null}
-        // onChange={(event: any) => phoneChanged(event.target.value)}
+        value={phone}
+        disabled={fieldsPending}
+        error={phoneError ? phoneErrorText[phoneError] : null}
+        onChange={(event: any) => updatePhone(event.target.value)}
       />
     </Input.Wrapper>
   );
 }
 
 function ErrorView() {
-  // // const error = useUnit($signUpError);
+  const error = useUnit($error);
 
-  // if (!error) {
-  //   return <Space h="xl" />;
-  // }
+  if (!error) {
+    return <Space h="xl" />;
+  }
 
-  // if (error?.error === 'invalid_credentials') {
-  //   return <Text c="red">Неверный пароль и/или почта</Text>;
-  // }
+  if (error?.error === 'invalid_credentials') {
+    return <Text c="red">Неверный пароль и/или почта</Text>;
+  }
 
-  // if (error?.error === 'user_exist') {
-  //   return <Text c="red">Username уже занят</Text>;
-  // }
+  if (error?.error === 'user_exist') {
+    return <Text c="red">Username уже занят</Text>;
+  }
 
   return <Text c="red">Что-то пошло не так, попробуйте еще раз, пожалуйста</Text>;
 }
