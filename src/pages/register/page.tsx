@@ -21,6 +21,8 @@ import {IMaskInput} from 'react-imask';
 import {routes} from '~/shared/routing';
 
 import {
+  $code,
+  $confirmCode,
   $email,
   $emailError,
   $error,
@@ -31,7 +33,8 @@ import {
   $phoneError,
   $userName,
   $userNameError,
-  pageMounted,
+  codeChanged,
+  confirmPhoneFormSubmitted,
   submittFormRegistration,
   updateEmail,
   updatePassword,
@@ -40,18 +43,14 @@ import {
 } from './model';
 
 export const RegisterPage = () => {
-  // const [confirmPhone] = useUnit([$confirmPhone]);
-
-  useEffect(() => {
-    pageMounted();
-  }, []);
+  const [confirmCode] = useUnit([$confirmCode]);
 
   const onFormSubmit: FormEventHandler = (e) => {
     e.preventDefault();
     submittFormRegistration();
   };
 
-  // if (confirmPhone) return <ConfrimPhoneForm />;
+  if (confirmCode) return <ConfrimPhoneForm />;
 
   return (
     <>
@@ -215,11 +214,7 @@ function ErrorView() {
 }
 
 function ConfrimPhoneForm() {
-  // const [code, confirmPhone, confirmPhoneFormDisabled] = useUnit([
-  //   $code,
-  //   $confirmPhone,
-  //   $confirmPhoneFormDisabled,
-  // ]);
+  const [code, fieldsPending] = useUnit([$code, $fieldsPending]);
 
   return (
     <Container size={420} my={40} w="100%" h="100vh">
@@ -229,17 +224,17 @@ function ConfrimPhoneForm() {
       </Text>
 
       <Group position="center" mt="lg">
-        {/* <PinInput
+        <PinInput
           value={code}
           length={6}
-          disabled={confirmPhoneFormDisabled}
+          disabled={fieldsPending}
           onChange={(value) => {
             codeChanged(value);
-            if (value.length === 6) {
-              confirmPhoneFormSubmitted();
-            }
+            // if (value.length === 6) {
+            //   confirmPhoneFormSubmitted();
+            // }
           }}
-        /> */}
+        />
       </Group>
     </Container>
   );

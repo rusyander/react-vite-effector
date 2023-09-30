@@ -145,14 +145,18 @@ currentRoute.opened.watch(() => {
 ananimusRoute.opened.watch(() => {
   // console.log('Register page is open with authorized user');
 });
-export const signUpFx = attach({effect: api.signUpFx});
+const signUpFx = attach({effect: api.signUpFx});
+const confirmPhoneFx = attach({effect: api.confirmPhone});
 
-export const pageMounted = createEvent();
 export const updateUserName = createEvent<string>();
 export const updateEmail = createEvent<string>();
 export const updatePassword = createEvent<string>();
 export const updatePhone = createEvent<string>();
+export const codeChanged = createEvent<string>();
+export const confirmCodeChanged = createEvent<string>();
+
 export const submittFormRegistration = createEvent();
+export const confirmPhoneFormSubmitted = createEvent();
 
 export const $userName = createStore('');
 export const $userNameError = createStore<null | 'empty' | 'invalid'>(null);
@@ -166,6 +170,9 @@ export const $passwordError = createStore<null | 'empty' | 'invalid'>(null);
 export const $phone = createStore('');
 export const $phoneError = createStore<null | 'empty' | 'invalid'>(null);
 
+export const $code = createStore('');
+export const $confirmCode = createStore<boolean>(false);
+
 export const $error = createStore<api.SignUpError | null>(null);
 export const $fieldsPending = api.signUpFx.pending;
 
@@ -178,9 +185,10 @@ $userName.on(updateUserName, (_, userName) => userName);
 $email.on(updateEmail, (_, email) => email);
 $password.on(updatePassword, (_, password) => password);
 $phone.on(updatePhone, (_, phone) => phone);
+$code.on(codeChanged, (_, code) => code);
 
 reset({
-  clock: pageMounted,
+  clock: ananimusRoute.closed,
   target: [
     $userName,
     $userNameError,
@@ -191,6 +199,8 @@ reset({
     $phone,
     $phoneError,
     $error,
+    $confirmCode,
+    $code,
   ],
 });
 
@@ -247,11 +257,24 @@ sample({
 
 sample({
   clock: signUpFx.done,
-  target: sessionRequestFx,
+  fn: () => true,
+  target: $confirmCode,
 });
 
 $error.reset(submittFormRegistration);
 $error.on(signUpFx.failData, (_, error) => error);
+
+sample({
+  clock: confirmPhoneFormSubmitted,
+  source: {code: $code},
+  filter: (value) => codeOk(value.code),
+  target: [confirmPhoneFormSubmitted, confirmPhoneFx],
+});
+
+sample({
+  clock: confirmPhoneFx.done,
+  target: sessionRequestFx,
+});
 
 function currentUserName(value: string) {
   return value.length > 3;
@@ -271,4 +294,8 @@ function currentPhone(value: string) {
 
 function isEmpty(value: string) {
   return value.trim().length === 0;
+}
+
+function codeOk(value: string) {
+  return value.trim().length === 6;
 }

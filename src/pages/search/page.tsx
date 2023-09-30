@@ -17,17 +17,16 @@ import React, {useEffect} from 'react';
 import {useIntersection} from '~/shared/lib/intersection';
 import {RecipeCard} from '~/shared/ui';
 
-// import {
-//   $currentMealTypes,
-//   $kcal,
-//   $searching,
-//   $searchQuery,
-//   $searchResults,
-//   endOfResultsReached,
-//   kcalChanged,
-//   mealTypeToggled,
-//   searchQueryChanged,
-// } from './model';
+import {
+  $currentMealTypes,
+  $kcal,
+  $searching,
+  $searchQuery,
+  $searchResults, // endOfResultsReached,
+  kcalChanged,
+  mealTypeToggled,
+  searchQueryChanged,
+} from './model';
 
 export const SearchPage = () => {
   const intersectionRef = React.useRef(null);
@@ -59,7 +58,7 @@ export const SearchPage = () => {
         <MealTypes />
         <Calories />
 
-        {/*
+        {/*         
         <Group position="left" my="lg">
           <Text fz="md">Do you have allergies ?</Text>
           <Switch
@@ -127,7 +126,7 @@ export const SearchPage = () => {
       </Box>
 
       <ResultsLoader />
-      {/* <Results /> */}
+      <Results />
 
       <Box p="sm" ref={intersectionRef}>
         {intersection?.isIntersecting ? 'Fully visible' : 'Obscured'}
@@ -137,7 +136,7 @@ export const SearchPage = () => {
 };
 
 function SearchQuery() {
-  // const query = useUnit($searchQuery);
+  const query = useUnit($searchQuery);
   return (
     <Group position="left" my="lg">
       <TextInput
@@ -146,41 +145,41 @@ function SearchQuery() {
         placeholder="type one or more keywords"
         label="Find by keyword"
         withAsterisk
-        // value={query}
-        // onChange={(event) => searchQueryChanged(event.target.value)}
+        value={query}
+        onChange={(event) => searchQueryChanged(event.target.value)}
       />
     </Group>
   );
 }
 
 function MealTypes() {
-  // const meals = useList($currentMealTypes, {
-  //   getKey: ({meal}) => meal,
-  //   fn: ({meal, selected}) => (
-  //     <Chip variant="light" value={meal} checked={selected} onChange={() => mealTypeToggled(meal)}>
-  //       {meal}
-  //     </Chip>
-  //   ),
-  // });
+  const meals = useList($currentMealTypes, {
+    getKey: ({meal}) => meal,
+    fn: ({meal, selected}) => (
+      <Chip variant="light" value={meal} checked={selected} onChange={() => mealTypeToggled(meal)}>
+        {meal}
+      </Chip>
+    ),
+  });
 
   return (
     <Group position="left" my="lg">
       <Text fz="md">meal types</Text>
-      {/* {meals} */}
+      {meals}
     </Group>
   );
 }
 
 function Calories() {
-  // const calories = useUnit($kcal);
+  const calories = useUnit($kcal);
   return (
     <Group position="left" my="lg">
       <NumberInput
         w="30%"
         defaultValue={100}
         placeholder="kcal"
-        // value={calories}
-        // onChange={(value) => kcalChanged(typeof value === 'number' ? value : 0)}
+        value={calories}
+        onChange={(value) => kcalChanged(typeof value === 'number' ? value : 0)}
       />
       <Text fz="md">kcal</Text>
     </Group>
@@ -188,25 +187,25 @@ function Calories() {
 }
 
 function ResultsLoader() {
-  // const loading = useUnit($searching);
-  // if (loading) {
-  //   return (
-  //     <Center>
-  //       <Loader variant="dots" />
-  //     </Center>
-  //   );
-  // }
+  const loading = useUnit($searching);
+  if (loading) {
+    return (
+      <Center>
+        <Loader variant="dots" />
+      </Center>
+    );
+  }
   return null;
 }
 
 function Results() {
-  // const results = useList($searchResults, {
-  //   getKey: (recipe) => recipe.label,
-  //   fn: (recipe) => (
-  //     <Grid.Col span={6}>
-  //       <RecipeCard recipe={recipe} />
-  //     </Grid.Col>
-  //   ),
-  // });
-  // return <Grid grow>{results}</Grid>;
+  const results = useList($searchResults, {
+    getKey: (recipe) => recipe.label,
+    fn: (recipe) => (
+      <Grid.Col span={6}>
+        <RecipeCard recipe={recipe} />
+      </Grid.Col>
+    ),
+  });
+  return <Grid grow>{results}</Grid>;
 }

@@ -51,17 +51,41 @@ export type Recipe = {
   url: string;
 };
 
-// type RecipiesSearchDone = {
-//   from: number;
-//   to: number;
-//   q: string;
-//   count: number;
-//   hits: {recipe: Recipe}[];
-//   more: boolean;
-//   _links: {
-//     next?: {href: string};
-//   };
+type RecipiesSearchDone = {
+  from: number;
+  to: number;
+  q: string;
+  count: number;
+  hits: {recipe: Recipe}[];
+  more: boolean;
+  _links?: {
+    next?: {href: string};
+  };
+};
+
+// export const requestSearchRecipe = ({params, config}: RecipiesSearchDone) => {
+//   api.get<RecipiesSearch>('/', {...config, params});
 // };
+
+export const recipiesSearchFx = createEffect<RecipiesSearch, RecipiesSearchDone>((form) => {
+  const urlSearch = new URLSearchParams();
+  if (form.q) {
+    urlSearch.append('q', form.q);
+  }
+  if (form.mealType) {
+    form.mealType.forEach((mealType) => {
+      urlSearch.append('mealType', mealType);
+    });
+  }
+  if (form.calories) {
+    urlSearch.append('calories', String(form.calories));
+  }
+  return requestFx({
+    path: `/?${urlSearch.toString()}`,
+    method: 'GET',
+    instance: 'api',
+  });
+});
 
 // export const recipiesSearchFx = createEffect<RecipiesSearch, RecipiesSearchDone>((form) => {
 //   const urlSearch = new URLSearchParams();
@@ -103,27 +127,7 @@ interface SignIn {
   password: string;
 }
 
-// interface SignInParams {
-//   params: {
-//     email: string;
-//     password: string;
-//   };
-//   config?: AxiosRequestConfig;
-// }
-
 export type SignInError = {error: 'invalid_credentials'} | {error: 'invalid_request'};
-
-// export const signInFx = createEffect<SignIn, User, SignInError>(async (form) => {
-//   await new Promise((resolve) => setTimeout(resolve, 600));
-//   return requestFx({
-//     path: '/signin',
-//     method: 'POST',
-//     body: form,
-//   });
-// });
-
-// export const signIn = ({params, config}: SignInParams) =>
-//   mockapi.post<SignIn>('/signin', {...config, params});
 
 export const singInFx = createEffect<SignIn, User, SignInError>(async (form) => {
   await new Promise((resolve) => setTimeout(resolve, 600));
