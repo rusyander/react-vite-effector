@@ -87,6 +87,15 @@ export const recipiesSearchFx = createEffect<RecipiesSearch, RecipiesSearchDone>
   });
 });
 
+export const recipiesNextPageFx = createEffect<{nextUrl: string}, RecipiesSearchDone>(({nextUrl}) =>
+  api({
+    method: 'GET',
+    url: nextUrl,
+  })
+    .then((responce) => responce.data)
+    .catch((res) => Promise.reject(res.response.data)),
+);
+
 // export const recipiesSearchFx = createEffect<RecipiesSearch, RecipiesSearchDone>((form) => {
 //   const urlSearch = new URLSearchParams();
 //   if (form.q) {

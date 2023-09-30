@@ -22,7 +22,8 @@ import {
   $kcal,
   $searching,
   $searchQuery,
-  $searchResults, // endOfResultsReached,
+  $searchResults,
+  endOfResultsReached,
   kcalChanged,
   mealTypeToggled,
   searchQueryChanged,
@@ -38,7 +39,7 @@ export const SearchPage = () => {
 
   useEffect(() => {
     if (intersection?.isIntersecting) {
-      // endOfResultsReached();
+      endOfResultsReached();
     }
   }, [intersection?.isIntersecting]);
 
