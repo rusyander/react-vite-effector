@@ -1,7 +1,7 @@
+import {useState} from 'react';
 import {ActionIcon, Box, ColorScheme, ColorSchemeProvider, MantineProvider} from '@mantine/core';
 import {IconMoonStars, IconSun} from '@tabler/icons-react';
 import {RouterProvider} from 'atomic-router-react';
-import {useState} from 'react';
 
 import {Pages} from '~/pages';
 
